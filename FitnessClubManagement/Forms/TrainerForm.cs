@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace FitnessClubManagement
 {
-    public partial class LoginForm : Form
+    public partial class TrainerForm : Form
     {
-        public LoginForm()
+        public TrainerForm()
         {
             InitializeComponent();
         }
