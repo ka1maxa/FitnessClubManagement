@@ -1,14 +1,8 @@
 ﻿using FitnessClubManagement.Enums;
+using FitnessClubManagement.Forms;
 using FitnessClubManagement.Models;
 using FitnessClubManagement.Services;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FitnessClubManagement
@@ -18,7 +12,9 @@ namespace FitnessClubManagement
         public LoginForm()
         {
             InitializeComponent();
+            btnLogin.Click += btnLogin_Click; // attach click event
         }
+
         private void btnLogin_Click(object sender, EventArgs e)
         {
             lblError.Text = "";
@@ -39,15 +35,12 @@ namespace FitnessClubManagement
                 case UserRole.Admin:
                     dashboard = new AdminForm();
                     break;
-
                 case UserRole.Manager:
                     dashboard = new ManagerForm();
                     break;
-
                 case UserRole.Trainer:
                     dashboard = new TrainerForm();
                     break;
-
                 case UserRole.Member:
                     dashboard = new MemberForm();
                     break;

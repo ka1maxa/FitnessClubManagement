@@ -2,7 +2,6 @@
 using System.IO;
 using Newtonsoft.Json;
 using FitnessClubManagement.Models;
-using System.Xml;
 
 namespace FitnessClubManagement.Services
 {
@@ -10,22 +9,25 @@ namespace FitnessClubManagement.Services
     {
         private const string MembersFile = "members.json";
         private const string TrainersFile = "trainers.json";
+        private const string MembershipsFile = "memberships.json";
 
         public List<Member> Members { get; private set; }
         public List<Trainer> Trainers { get; private set; }
+        public List<Membership> Memberships { get; private set; }
 
         public DataService()
         {
             Members = new List<Member>();
             Trainers = new List<Trainer>();
+            Memberships = new List<Membership>();
         }
 
-        // ---------------- LOAD ----------------
-
+        // -------- LOAD --------
         public void LoadData()
         {
             LoadMembers();
             LoadTrainers();
+            LoadMemberships();
         }
 
         private void LoadMembers()
@@ -54,24 +56,49 @@ namespace FitnessClubManagement.Services
                        ?? new List<Trainer>();
         }
 
-        // ---------------- SAVE ----------------
+        private void LoadMemberships()
+        {
+            if (!File.Exists(MembershipsFile))
+            {
+                Memberships = new List<Membership>();
+                return;
+            }
 
+            string json = File.ReadAllText(MembershipsFile);
+            Memberships = JsonConvert.DeserializeObject<List<Membership>>(json)
+                          ?? new List<Membership>();
+        }
+
+        // -------- SAVE --------
         public void SaveData()
         {
             SaveMembers();
             SaveTrainers();
+            SaveMemberships();
         }
 
         private void SaveMembers()
         {
-            string json = JsonConvert.SerializeObject(Members, Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText(MembersFile, json);
+            File.WriteAllText(
+                MembersFile,
+                JsonConvert.SerializeObject(Members, Formatting.Indented)
+            );
         }
 
         private void SaveTrainers()
         {
-            string json = JsonConvert.SerializeObject(Trainers, Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText(TrainersFile, json);
+            File.WriteAllText(
+                TrainersFile,
+                JsonConvert.SerializeObject(Trainers, Formatting.Indented)
+            );
+        }
+
+        private void SaveMemberships()
+        {
+            File.WriteAllText(
+                MembershipsFile,
+                JsonConvert.SerializeObject(Memberships, Formatting.Indented)
+            );
         }
     }
 }

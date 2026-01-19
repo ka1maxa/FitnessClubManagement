@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FitnessClubManagement.Models;
 
@@ -6,27 +7,39 @@ namespace FitnessClubManagement.Services
 {
     public class MembershipManager
     {
-        private DataService dataService;
+        private readonly DataService _dataService;
 
-        public event Action<Member> MembershipExpired;
+        public event Action<Membership> MembershipExpired;
 
-        public MembershipManager(DataService dataService)
+        public MembershipManager()
         {
-            this.dataService = dataService;
+            _dataService = new DataService();
+            _dataService.LoadData();
         }
 
-    
-        public void CheckMemberships()
+        public void CheckExpirations()
         {
-            var expiredMembers = dataService.Members
-                .Where(m => m.Membership != null && m.Membership.IsExpired())
+            var expired = _dataService.Memberships
+                .Where(m => m.EndDate < DateTime.Now && m.IsExpired == false)
                 .ToList();
 
-            foreach (var member in expiredMembers)
+            foreach (var membership in expired)
             {
-                member.IsActive = false;
-                MembershipExpired?.Invoke(member);
+                membership.IsExpired = true;
+                MembershipExpired?.Invoke(membership);
             }
+
+            if (expired.Any())
+            {
+                _dataService.SaveData();
+            }
+        }
+
+        public List<Membership> GetExpiredMemberships()
+        {
+            return _dataService.Memberships
+                .Where(m => m.IsExpired)
+                .ToList();
         }
     }
 }
