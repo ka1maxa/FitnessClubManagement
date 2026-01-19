@@ -6,156 +6,146 @@ namespace FitnessClubManagement
 {
     partial class LoginForm
     {
-        private TextBox txtUsername;
-        private TextBox txtPassword;
-        private Label lblError;
-        private Button btnLogin;
-
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
+        private Panel panelCard;
+        private Label lblTitle;
+        private Label lblSubtitle;
+        private TextBox txtUsername;
+        private TextBox txtPassword;
+        private Panel underlineUser;
+        private Panel underlinePass;
+        private Button btnLogin;
+        private Label lblError;
+
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
                 components.Dispose();
+
             base.Dispose(disposing);
         }
 
         private void InitializeComponent()
         {
+            this.panelCard = new Panel();
+            this.lblTitle = new Label();
+            this.lblSubtitle = new Label();
+            this.txtUsername = new TextBox();
+            this.underlineUser = new Panel();
+            this.txtPassword = new TextBox();
+            this.underlinePass = new Panel();
+            this.btnLogin = new Button();
+            this.lblError = new Label();
+
+            this.panelCard.SuspendLayout();
             this.SuspendLayout();
 
-            // Form settings
+            // ===== FORM =====
             this.BackColor = Color.FromArgb(18, 18, 18);
             this.ClientSize = new Size(700, 480);
             this.FormBorderStyle = FormBorderStyle.None;
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.Name = "LoginForm";
 
-            // Card panel
-            Panel panelCard = new Panel()
-            {
-                Size = new Size(360, 400),
-                Location = new Point((this.Width - 360) / 2, (this.Height - 400) / 2),
-                BackColor = Color.FromArgb(30, 30, 30)
-            };
-            this.Controls.Add(panelCard);
+            // ===== PANEL CARD =====
+            this.panelCard.BackColor = Color.FromArgb(28, 28, 28);
+            this.panelCard.Size = new Size(380, 420);
+            this.panelCard.Location = new Point(
+                (this.ClientSize.Width - this.panelCard.Width) / 2,
+                (this.ClientSize.Height - this.panelCard.Height) / 2
+            );
 
-            // Title
-            Label lblTitle = new Label()
-            {
-                Text = "FITNESS CLUB",
-                Font = new Font("Segoe UI", 22, FontStyle.Bold),
-                ForeColor = Color.White,
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Top,
-                Height = 70
-            };
-            panelCard.Controls.Add(lblTitle);
+            // ===== TITLE =====
+            this.lblTitle.Text = "Welcome Back";
+            this.lblTitle.Font = new Font("Segoe UI", 20, FontStyle.Bold);
+            this.lblTitle.ForeColor = Color.White;
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Location = new Point(60, 40);
 
-            // Subtitle
-            Label lblSubtitle = new Label()
-            {
-                Text = "Sign in to continue",
-                Font = new Font("Segoe UI", 10),
-                ForeColor = Color.Gray,
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Top,
-                Height = 30
-            };
-            panelCard.Controls.Add(lblSubtitle);
+            // ===== SUBTITLE =====
+            this.lblSubtitle.Text = "Login to your account";
+            this.lblSubtitle.Font = new Font("Segoe UI", 10);
+            this.lblSubtitle.ForeColor = Color.Gray;
+            this.lblSubtitle.AutoSize = true;
+            this.lblSubtitle.Location = new Point(90, 85);
 
-            int inputWidth = 280;
-            int inputHeight = 35;
-            int marginTop = 120;
+            // ===== USERNAME =====
+            this.txtUsername.Text = "Username";
+            this.txtUsername.ForeColor = Color.Gray;
+            this.txtUsername.Font = new Font("Segoe UI", 11);
+            this.txtUsername.BorderStyle = BorderStyle.None;
+            this.txtUsername.BackColor = this.panelCard.BackColor;
+            this.txtUsername.Location = new Point(40, 140);
+            this.txtUsername.Width = 300;
+            this.txtUsername.Enter += RemoveText;
+            this.txtUsername.Leave += AddText;
 
-            // Username textbox
-            txtUsername = new TextBox()
-            {
-                Font = new Font("Segoe UI", 10),
-                BackColor = Color.FromArgb(45, 45, 45),
-                ForeColor = Color.Gray,
-                BorderStyle = BorderStyle.None,
-                Size = new Size(inputWidth, inputHeight),
-                Location = new Point((panelCard.Width - inputWidth) / 2, marginTop),
-                Text = "Username"
-            };
-            txtUsername.GotFocus += RemoveText;
-            txtUsername.LostFocus += AddText;
-            panelCard.Controls.Add(txtUsername);
+            // ===== USERNAME UNDERLINE =====
+            this.underlineUser.BackColor = Color.Gray;
+            this.underlineUser.Size = new Size(300, 2);
+            this.underlineUser.Location = new Point(40, 165);
 
-            Panel underlineUser = new Panel()
-            {
-                Size = new Size(inputWidth, 2),
-                BackColor = Color.Gray,
-                Location = new Point(txtUsername.Left, txtUsername.Bottom)
-            };
-            panelCard.Controls.Add(underlineUser);
+            // ===== PASSWORD =====
+            this.txtPassword.Text = "Password";
+            this.txtPassword.ForeColor = Color.Gray;
+            this.txtPassword.Font = new Font("Segoe UI", 11);
+            this.txtPassword.BorderStyle = BorderStyle.None;
+            this.txtPassword.BackColor = this.panelCard.BackColor;
+            this.txtPassword.Location = new Point(40, 200);
+            this.txtPassword.Width = 300;
+            this.txtPassword.Enter += RemoveText;
+            this.txtPassword.Leave += AddText;
 
-            // Password textbox
-            txtPassword = new TextBox()
-            {
-                Font = new Font("Segoe UI", 10),
-                BackColor = Color.FromArgb(45, 45, 45),
-                ForeColor = Color.Gray,
-                BorderStyle = BorderStyle.None,
-                Size = new Size(inputWidth, inputHeight),
-                Location = new Point((panelCard.Width - inputWidth) / 2, txtUsername.Bottom + 30),
-                Text = "Password"
-            };
-            txtPassword.GotFocus += RemoveText;
-            txtPassword.LostFocus += AddText;
-            panelCard.Controls.Add(txtPassword);
+            // ===== PASSWORD UNDERLINE =====
+            this.underlinePass.BackColor = Color.Gray;
+            this.underlinePass.Size = new Size(300, 2);
+            this.underlinePass.Location = new Point(40, 225);
 
-            Panel underlinePass = new Panel()
-            {
-                Size = new Size(inputWidth, 2),
-                BackColor = Color.Gray,
-                Location = new Point(txtPassword.Left, txtPassword.Bottom)
-            };
-            panelCard.Controls.Add(underlinePass);
+            // ===== LOGIN BUTTON =====
+            this.btnLogin.Text = "LOGIN";
+            this.btnLogin.Font = new Font("Segoe UI", 11, FontStyle.Bold);
+            this.btnLogin.Size = new Size(300, 42);
+            this.btnLogin.Location = new Point(40, 270);
+            this.btnLogin.BackColor = Color.FromArgb(65, 105, 225); // Royal Blue
+            this.btnLogin.ForeColor = Color.White;
+            this.btnLogin.FlatStyle = FlatStyle.Flat;
+            this.btnLogin.FlatAppearance.BorderSize = 0;
 
-            // Login button
-            btnLogin = new Button()
-            {
-                Text = "LOGIN",
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(0, 200, 150),
-                FlatStyle = FlatStyle.Flat,
-                Size = new Size(inputWidth, 40),
-                Location = new Point((panelCard.Width - inputWidth) / 2, txtPassword.Bottom + 50)
-            };
-            btnLogin.FlatAppearance.BorderSize = 0;
+            // ===== ERROR LABEL =====
+            this.lblError.Text = "";
+            this.lblError.ForeColor = Color.IndianRed;
+            this.lblError.Font = new Font("Segoe UI", 9);
+            this.lblError.AutoSize = true;
+            this.lblError.Location = new Point(40, 325);
 
+            // ===== ADD CONTROLS =====
+            this.panelCard.Controls.Add(this.lblTitle);
+            this.panelCard.Controls.Add(this.lblSubtitle);
+            this.panelCard.Controls.Add(this.txtUsername);
+            this.panelCard.Controls.Add(this.underlineUser);
+            this.panelCard.Controls.Add(this.txtPassword);
+            this.panelCard.Controls.Add(this.underlinePass);
+            this.panelCard.Controls.Add(this.btnLogin);
+            this.panelCard.Controls.Add(this.lblError);
 
-            panelCard.Controls.Add(btnLogin);
+            this.Controls.Add(this.panelCard);
 
-            // Error label
-            lblError = new Label()
-            {
-                ForeColor = Color.IndianRed,
-                AutoSize = false,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Size = new Size(panelCard.Width, 20),
-                Location = new Point(0, btnLogin.Bottom + 10)
-            };
-            panelCard.Controls.Add(lblError);
-
+            this.panelCard.ResumeLayout(false);
+            this.panelCard.PerformLayout();
             this.ResumeLayout(false);
         }
 
-        // Placeholder logic
+        // ===== PLACEHOLDER METHODS (USED BY DESIGNER EVENTS) =====
         private void RemoveText(object sender, EventArgs e)
         {
-            TextBox tb = (TextBox)sender;
+            TextBox tb = sender as TextBox;
+
             if (tb.Text == "Username" || tb.Text == "Password")
             {
                 tb.Text = "";
                 tb.ForeColor = Color.White;
+
                 if (tb == txtPassword)
                     tb.UseSystemPasswordChar = true;
             }
@@ -163,10 +153,12 @@ namespace FitnessClubManagement
 
         private void AddText(object sender, EventArgs e)
         {
-            TextBox tb = (TextBox)sender;
+            TextBox tb = sender as TextBox;
+
             if (string.IsNullOrWhiteSpace(tb.Text))
             {
                 tb.ForeColor = Color.Gray;
+
                 if (tb == txtUsername)
                     tb.Text = "Username";
                 else
