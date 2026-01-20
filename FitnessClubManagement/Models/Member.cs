@@ -1,23 +1,23 @@
-﻿using FitnessClubManagement.Models;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
-public class Member : Person
+namespace FitnessClubManagement.Models
 {
-    public DateTime DateOfBirth { get; set; }
-    public double Height { get; set; } 
-    public double Weight { get; set; } 
-    public Membership Membership { get; set; }  
-    public string PhoneNumber { get; set; }     
-    public bool IsActive { get; set; }
-
-    public int CalculateAge()
+    public class Member : Person
     {
-        return DateTime.Now.Year - DateOfBirth.Year;
-    }
+        public DateTime DateOfBirth { get; set; }
+        public double Height { get; set; }
+        public double Weight { get; set; }
 
-    public double CalculateBMI()
-    {
-        double heightInMeters = Height / 100;
-        return Weight / (heightInMeters * heightInMeters);
+        [JsonIgnore]
+        public Membership Membership { get; set; }
+        public int MembershipId { get; set; }
+
+        public string PhoneNumber { get; set; }
+        public bool IsActive { get; set; } = true;
+
+        [JsonIgnore]
+        public Trainer AssignedTrainer { get; set; }
+        public string AssignedTrainerUsername { get; set; }
     }
 }

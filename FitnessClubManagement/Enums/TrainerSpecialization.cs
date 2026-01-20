@@ -2,9 +2,9 @@
 {
     public enum TrainerSpecialization
     {
-        Cardio,
         Strength,
-        CrossFit,
-        Yoga
+        Cardio,
+        Yoga,
+        Crossfit
     }
 }

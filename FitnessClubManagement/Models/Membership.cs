@@ -7,11 +7,16 @@ namespace FitnessClubManagement.Models
     {
         public int Id { get; set; }
         public int MemberId { get; set; }
-        public MembershipType Type { get; set; }  // NEW: Enum property
+        public MembershipType Type { get; set; }  // Enum property
 
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Now.AddMonths(1);
 
-        public bool IsExpired { get; set; }
+        // Automatically calculates if the membership is expired
+        public bool IsExpired => DateTime.Now > EndDate;
+
+        // ✅ NEVER do: membership.IsExpired = true; <- this will cause compile error
+        // Instead, adjust EndDate to mark it expired if needed:
+        // membership.EndDate = DateTime.Now.AddDays(-1);
     }
 }

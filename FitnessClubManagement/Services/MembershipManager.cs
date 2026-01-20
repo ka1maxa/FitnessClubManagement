@@ -25,13 +25,13 @@ namespace FitnessClubManagement.Services
 
             foreach (var membership in expired)
             {
-                membership.IsExpired = true;
+//                membership.IsExpired = true;
                 MembershipExpired?.Invoke(membership);
             }
 
             if (expired.Any())
             {
-                _dataService.SaveData();
+                _dataService.SaveMembers();
             }
         }
 

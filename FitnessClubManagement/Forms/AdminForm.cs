@@ -1,9 +1,8 @@
-﻿using FitnessClubManagement.Models;
-using FitnessClubManagement.Services;
-using FitnessClubManagement.Enums;
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows.Forms;
+using FitnessClubManagement.Models;
+using FitnessClubManagement.Services;
 
 namespace FitnessClubManagement.Forms
 {
@@ -11,133 +10,93 @@ namespace FitnessClubManagement.Forms
     {
         private DataService _dataService;
 
-        public AdminForm()
+        public AdminForm(DataService dataService)
         {
+            _dataService = dataService;
             InitializeComponent();
 
-            _dataService = new DataService();
-            _dataService.LoadData();
-
-            dgvMembers.DataSource = _dataService.Members.ToList();
-
-            // Button events
-            btnAdd.Click += BtnAdd_Click;
+            btnAddMember.Click += BtnAddMember_Click;
             btnEdit.Click += BtnEdit_Click;
             btnDelete.Click += BtnDelete_Click;
 
-            dgvMembers.SelectionChanged += DgvMembers_SelectionChanged;
-
-            // Membership ComboBox binding
-            cmbMembership.DataSource = Enum.GetValues(typeof(MembershipType));
+            UpdateGrid();
         }
 
-        private void BtnAdd_Click(object sender, EventArgs e)
+        private void UpdateGrid()
         {
-            if (!int.TryParse(txtId.Text, out int id))
-            {
-                MessageBox.Show("Invalid ID!");
-                return;
-            }
+            dgvMembers.DataSource = null;
+            dgvMembers.AutoGenerateColumns = false;
+            dgvMembers.Columns.Clear();
 
-            if (_dataService.Members.Any(x => x.Id == id))
-            {
-                MessageBox.Show("Member with this ID already exists!");
-                return;
-            }
+            dgvMembers.DataSource = _dataService.Members;
 
-            Member m = new Member
+            dgvMembers.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Full Name", DataPropertyName = "FullName" });
+            dgvMembers.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "DOB", DataPropertyName = "DateOfBirth" });
+            dgvMembers.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Height", DataPropertyName = "Height" });
+            dgvMembers.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Weight", DataPropertyName = "Weight" });
+            dgvMembers.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Phone", DataPropertyName = "PhoneNumber" });
+            dgvMembers.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Membership", DataPropertyName = "Membership" });
+            dgvMembers.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Trainer", DataPropertyName = "AssignedTrainer" });
+            dgvMembers.Columns.Add(new DataGridViewCheckBoxColumn { HeaderText = "IsActive", DataPropertyName = "IsActive" });
+
+            dgvMembers.CellFormatting += (s, e) =>
             {
-                Id = id,
-                FullName = txtFullName.Text,
-                Height = double.TryParse(txtHeight.Text, out double h) ? h : 0,
-                Weight = double.TryParse(txtWeight.Text, out double w) ? w : 0,
-                DateOfBirth = dtBirth.Value,
-                Membership = new Membership
-                {
-                    Type = (MembershipType)cmbMembership.SelectedItem
-                },
-                PhoneNumber = txtPhoneNumber.Text, // ✅ ეს უკვე არსებობს
-                IsActive = true
+                if (dgvMembers.Columns[e.ColumnIndex].DataPropertyName == "Membership" && e.Value is Membership mem)
+                    e.Value = mem != null ? mem.Type.ToString() : "None";
+
+                if (dgvMembers.Columns[e.ColumnIndex].DataPropertyName == "AssignedTrainer" && e.Value is Trainer tr)
+                    e.Value = tr != null ? tr.FullName : "";
             };
+        }
 
-            _dataService.Members.Add(m);
-            UpdateGrid();
-            ClearInputs();
+        private void BtnAddMember_Click(object sender, EventArgs e)
+        {
+            MemberForm form = new MemberForm(_dataService);
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                _dataService.Members.Add(form.NewMember);
+                _dataService.SaveMembers();   // ✅ აქ იყო პრობლემა
+                UpdateGrid();
+            }
         }
 
         private void BtnEdit_Click(object sender, EventArgs e)
         {
-            if (!int.TryParse(txtId.Text, out int id)) return;
+            if (dgvMembers.SelectedRows.Count == 0) return;
 
-            var member = _dataService.Members.FirstOrDefault(x => x.Id == id);
-            if (member == null)
+            var member = (Member)dgvMembers.SelectedRows[0].DataBoundItem;
+
+            MemberForm form = new MemberForm(_dataService, member);
+            if (form.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show("Member not found!");
-                return;
+                member.FullName = form.NewMember.FullName;
+                member.DateOfBirth = form.NewMember.DateOfBirth;
+                member.Height = form.NewMember.Height;
+                member.Weight = form.NewMember.Weight;
+                member.PhoneNumber = form.NewMember.PhoneNumber;
+                member.Membership = form.NewMember.Membership;
+                member.MembershipId = form.NewMember.MembershipId;
+                member.AssignedTrainer = form.NewMember.AssignedTrainer;
+                member.AssignedTrainerUsername = form.NewMember.AssignedTrainerUsername;
+                member.IsActive = form.NewMember.IsActive;
+
+                _dataService.SaveMembers();   // ✅ აქაც
+                UpdateGrid();
             }
-
-            member.FullName = txtFullName.Text;
-            member.Height = double.TryParse(txtHeight.Text, out double h) ? h : member.Height;
-            member.Weight = double.TryParse(txtWeight.Text, out double w) ? w : member.Weight;
-            member.DateOfBirth = dtBirth.Value;
-
-            if (member.Membership == null)
-                member.Membership = new Membership();
-
-            member.Membership.Type = (MembershipType)cmbMembership.SelectedItem;
-            member.PhoneNumber = txtPhoneNumber.Text;
-
-            UpdateGrid();
-            ClearInputs();
         }
 
         private void BtnDelete_Click(object sender, EventArgs e)
         {
             if (dgvMembers.SelectedRows.Count == 0) return;
 
-            if (dgvMembers.SelectedRows[0].DataBoundItem is Member m)
+            var member = (Member)dgvMembers.SelectedRows[0].DataBoundItem;
+
+            if (MessageBox.Show($"Delete {member.FullName}?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                _dataService.Members.Remove(m);
+                _dataService.Members.Remove(member);
+                _dataService.SaveMembers();   // ✅ და აქაც
                 UpdateGrid();
-                ClearInputs();
             }
-        }
-
-        private void DgvMembers_SelectionChanged(object sender, EventArgs e)
-        {
-            if (dgvMembers.SelectedRows.Count == 0) return;
-
-            if (dgvMembers.SelectedRows[0].DataBoundItem is Member m)
-            {
-                txtId.Text = m.Id.ToString();
-                txtFullName.Text = m.FullName;
-                txtHeight.Text = m.Height.ToString();
-                txtWeight.Text = m.Weight.ToString();
-                dtBirth.Value = m.DateOfBirth;
-
-                if (m.Membership != null)
-                    cmbMembership.SelectedItem = m.Membership.Type;
-
-                txtPhoneNumber.Text = m.PhoneNumber;
-            }
-        }
-
-        private void UpdateGrid()
-        {
-            _dataService.SaveData();
-            dgvMembers.DataSource = null;
-            dgvMembers.DataSource = _dataService.Members.ToList();
-        }
-
-        private void ClearInputs()
-        {
-            txtId.Clear();
-            txtFullName.Clear();
-            txtHeight.Clear();
-            txtWeight.Clear();
-            dtBirth.Value = DateTime.Now;
-            cmbMembership.SelectedIndex = 0;
-            txtPhoneNumber.Clear();
         }
     }
 }

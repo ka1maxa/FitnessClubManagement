@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using FitnessClubManagement.Models;
+using FitnessClubManagement.Enums;
 
 namespace FitnessClubManagement.Services
 {
@@ -22,25 +24,34 @@ namespace FitnessClubManagement.Services
             Memberships = new List<Membership>();
         }
 
-        // -------- LOAD --------
         public void LoadData()
         {
-            LoadMembers();
-            LoadTrainers();
             LoadMemberships();
+            LoadTrainers();
+            LoadMembers(); // ბოლოს – rebinding რომ იმუშაოს
         }
 
-        private void LoadMembers()
+        private void LoadMemberships()
         {
-            if (!File.Exists(MembersFile))
+            if (!File.Exists(MembershipsFile))
             {
-                Members = new List<Member>();
+                Memberships = new List<Membership>
+                {
+                    new Membership { Id = 1, Type = MembershipType.Basic },
+                    new Membership { Id = 2, Type = MembershipType.Premium },
+                    new Membership { Id = 3, Type = MembershipType.VIP }
+                };
+
+                File.WriteAllText(
+                    MembershipsFile,
+                    JsonConvert.SerializeObject(Memberships, Formatting.Indented)
+                );
                 return;
             }
 
-            string json = File.ReadAllText(MembersFile);
-            Members = JsonConvert.DeserializeObject<List<Member>>(json)
-                      ?? new List<Member>();
+            Memberships = JsonConvert.DeserializeObject<List<Membership>>(
+                File.ReadAllText(MembershipsFile)
+            ) ?? new List<Membership>();
         }
 
         private void LoadTrainers()
@@ -51,53 +62,44 @@ namespace FitnessClubManagement.Services
                 return;
             }
 
-            string json = File.ReadAllText(TrainersFile);
-            Trainers = JsonConvert.DeserializeObject<List<Trainer>>(json)
-                       ?? new List<Trainer>();
+            Trainers = JsonConvert.DeserializeObject<List<Trainer>>(
+                File.ReadAllText(TrainersFile)
+            ) ?? new List<Trainer>();
         }
 
-        private void LoadMemberships()
+        private void LoadMembers()
         {
-            if (!File.Exists(MembershipsFile))
+            if (!File.Exists(MembersFile))
             {
-                Memberships = new List<Membership>();
+                Members = new List<Member>();
                 return;
             }
 
-            string json = File.ReadAllText(MembershipsFile);
-            Memberships = JsonConvert.DeserializeObject<List<Membership>>(json)
-                          ?? new List<Membership>();
+            Members = JsonConvert.DeserializeObject<List<Member>>(
+                File.ReadAllText(MembersFile)
+            ) ?? new List<Member>();
+
+            // 🔥 ძალიან მნიშვნელოვანი – rebinding
+            foreach (var m in Members)
+            {
+                m.Membership = Memberships.FirstOrDefault(x => x.Id == m.MembershipId);
+                m.AssignedTrainer = Trainers
+                    .FirstOrDefault(t => t.Username == m.AssignedTrainerUsername);
+            }
         }
 
-        // -------- SAVE --------
-        public void SaveData()
+        public void SaveMembers()
         {
-            SaveMembers();
-            SaveTrainers();
-            SaveMemberships();
-        }
+            foreach (var m in Members)
+            {
+                m.MembershipId = m.Membership != null ? m.Membership.Id : 0;
+                m.AssignedTrainerUsername =
+                    m.AssignedTrainer != null ? m.AssignedTrainer.Username : null;
+            }
 
-        private void SaveMembers()
-        {
             File.WriteAllText(
                 MembersFile,
                 JsonConvert.SerializeObject(Members, Formatting.Indented)
-            );
-        }
-
-        private void SaveTrainers()
-        {
-            File.WriteAllText(
-                TrainersFile,
-                JsonConvert.SerializeObject(Trainers, Formatting.Indented)
-            );
-        }
-
-        private void SaveMemberships()
-        {
-            File.WriteAllText(
-                MembershipsFile,
-                JsonConvert.SerializeObject(Memberships, Formatting.Indented)
             );
         }
     }

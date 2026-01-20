@@ -6,6 +6,6 @@ namespace FitnessClubManagement.Models
     {
         public string Username { get; set; }
         public string Password { get; set; }
-        public UserRole Role { get; set; }
+        public FitnessClubManagement.Enums.UserRole Role { get; set; }
     }
 }
