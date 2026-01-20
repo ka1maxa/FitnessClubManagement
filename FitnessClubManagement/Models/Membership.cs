@@ -1,4 +1,5 @@
 ﻿using System;
+using FitnessClubManagement.Enums;
 
 namespace FitnessClubManagement.Models
 {
@@ -6,6 +7,7 @@ namespace FitnessClubManagement.Models
     {
         public int Id { get; set; }
         public int MemberId { get; set; }
+        public MembershipType Type { get; set; }  // NEW: Enum property
 
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

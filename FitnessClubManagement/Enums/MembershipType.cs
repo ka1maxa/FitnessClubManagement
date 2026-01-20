@@ -2,8 +2,8 @@
 {
     public enum MembershipType
     {
-        Monthly,
-        Quarterly,
-        Yearly
+        Basic,
+        Premium,
+        VIP
     }
 }

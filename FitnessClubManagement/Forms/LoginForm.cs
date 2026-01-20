@@ -1,9 +1,9 @@
-﻿using FitnessClubManagement.Enums;
+﻿using System;
+using System.Windows.Forms;
+using FitnessClubManagement.Enums;
 using FitnessClubManagement.Forms;
 using FitnessClubManagement.Models;
 using FitnessClubManagement.Services;
-using System;
-using System.Windows.Forms;
 
 namespace FitnessClubManagement
 {
@@ -11,16 +11,26 @@ namespace FitnessClubManagement
     {
         public LoginForm()
         {
-            InitializeComponent();
-            btnLogin.Click += btnLogin_Click; // attach click event
+            InitializeComponent(); // initialize design
+            btnLogin.Click += BtnLogin_Click; // attach login functionality
         }
 
-        private void btnLogin_Click(object sender, EventArgs e)
+        private void BtnLogin_Click(object sender, EventArgs e)
         {
             lblError.Text = "";
 
+            string username = txtUsername.Text.Trim();
+            string password = txtPassword.Text.Trim();
+
+            // Prevent placeholder values from being sent
+            if (username == "Username" || password == "Password" || username == "" || password == "")
+            {
+                lblError.Text = "Please enter your username and password.";
+                return;
+            }
+
             AuthService authService = new AuthService();
-            User user = authService.Login(txtUsername.Text, txtPassword.Text);
+            User user = authService.Login(username, password);
 
             if (user == null)
             {
@@ -30,6 +40,7 @@ namespace FitnessClubManagement
 
             Form dashboard = null;
 
+            // Switch based on Enum UserRole
             switch (user.Role)
             {
                 case UserRole.Admin:
@@ -44,6 +55,9 @@ namespace FitnessClubManagement
                 case UserRole.Member:
                     dashboard = new MemberForm();
                     break;
+                default:
+                    lblError.Text = "Unknown role!";
+                    return;
             }
 
             if (dashboard != null)
