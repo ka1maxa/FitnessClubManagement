@@ -28,7 +28,7 @@ namespace FitnessClubManagement.Services
         {
             LoadMemberships();
             LoadTrainers();
-            LoadMembers(); // ბოლოს – rebinding რომ იმუშაოს
+            LoadMembers();
         }
 
         private void LoadMemberships()
@@ -41,17 +41,10 @@ namespace FitnessClubManagement.Services
                     new Membership { Id = 2, Type = MembershipType.Premium },
                     new Membership { Id = 3, Type = MembershipType.VIP }
                 };
-
-                File.WriteAllText(
-                    MembershipsFile,
-                    JsonConvert.SerializeObject(Memberships, Formatting.Indented)
-                );
+                SaveMemberships();
                 return;
             }
-
-            Memberships = JsonConvert.DeserializeObject<List<Membership>>(
-                File.ReadAllText(MembershipsFile)
-            ) ?? new List<Membership>();
+            Memberships = JsonConvert.DeserializeObject<List<Membership>>(File.ReadAllText(MembershipsFile)) ?? new List<Membership>();
         }
 
         private void LoadTrainers()
@@ -61,10 +54,7 @@ namespace FitnessClubManagement.Services
                 Trainers = new List<Trainer>();
                 return;
             }
-
-            Trainers = JsonConvert.DeserializeObject<List<Trainer>>(
-                File.ReadAllText(TrainersFile)
-            ) ?? new List<Trainer>();
+            Trainers = JsonConvert.DeserializeObject<List<Trainer>>(File.ReadAllText(TrainersFile)) ?? new List<Trainer>();
         }
 
         private void LoadMembers()
@@ -75,16 +65,13 @@ namespace FitnessClubManagement.Services
                 return;
             }
 
-            Members = JsonConvert.DeserializeObject<List<Member>>(
-                File.ReadAllText(MembersFile)
-            ) ?? new List<Member>();
+            Members = JsonConvert.DeserializeObject<List<Member>>(File.ReadAllText(MembersFile)) ?? new List<Member>();
 
-            // 🔥 ძალიან მნიშვნელოვანი – rebinding
+            // rebinding
             foreach (var m in Members)
             {
                 m.Membership = Memberships.FirstOrDefault(x => x.Id == m.MembershipId);
-                m.AssignedTrainer = Trainers
-                    .FirstOrDefault(t => t.Username == m.AssignedTrainerUsername);
+                m.AssignedTrainer = Trainers.FirstOrDefault(t => t.Username == m.AssignedTrainerUsername);
             }
         }
 
@@ -92,15 +79,21 @@ namespace FitnessClubManagement.Services
         {
             foreach (var m in Members)
             {
-                m.MembershipId = m.Membership != null ? m.Membership.Id : 0;
-                m.AssignedTrainerUsername =
-                    m.AssignedTrainer != null ? m.AssignedTrainer.Username : null;
+                m.MembershipId = m.Membership?.Id ?? 0;
+                m.AssignedTrainerUsername = m.AssignedTrainer?.Username;
             }
 
-            File.WriteAllText(
-                MembersFile,
-                JsonConvert.SerializeObject(Members, Formatting.Indented)
-            );
+            File.WriteAllText(MembersFile, JsonConvert.SerializeObject(Members, Formatting.Indented));
+        }
+
+        public void SaveMemberships()
+        {
+            File.WriteAllText(MembershipsFile, JsonConvert.SerializeObject(Memberships, Formatting.Indented));
+        }
+
+        public void SaveTrainers()
+        {
+            File.WriteAllText(TrainersFile, JsonConvert.SerializeObject(Trainers, Formatting.Indented));
         }
     }
 }

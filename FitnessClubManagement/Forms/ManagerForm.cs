@@ -43,7 +43,7 @@ namespace FitnessClubManagement.Forms
         private void OnMembershipExpired(Membership membership)
         {
             MessageBox.Show(
-                $"აბონიმენტი ამოიწურა (Member ID: {membership.MemberId})",
+                $"აბონიმენტი ამოიწურა (Member ID: {membership.Id})",
                 "გაფრთხილება",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning

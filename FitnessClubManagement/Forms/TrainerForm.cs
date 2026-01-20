@@ -13,8 +13,12 @@ namespace FitnessClubManagement.Forms
 
         public TrainerForm(DataService dataService, Trainer trainer)
         {
+            if (dataService == null) throw new ArgumentNullException(nameof(dataService));
+            if (trainer == null) throw new ArgumentNullException(nameof(trainer));
+
             _dataService = dataService;
             _currentTrainer = trainer;
+
             InitializeComponent();
 
             lblTrainerName.Text = $"Trainer: {_currentTrainer.FullName}";
@@ -23,8 +27,10 @@ namespace FitnessClubManagement.Forms
 
         private void LoadMembersForTrainer()
         {
+            if (_dataService.Members == null) return;
+
             var membersForThisTrainer = _dataService.Members
-                .Where(m => m.AssignedTrainer != null && m.AssignedTrainer.FullName == _currentTrainer.FullName)
+                .Where(m => m.AssignedTrainer != null && m.AssignedTrainer.Username == _currentTrainer.Username)
                 .Select(m => new
                 {
                     m.FullName,

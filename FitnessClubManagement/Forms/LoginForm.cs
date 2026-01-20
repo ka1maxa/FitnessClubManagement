@@ -45,21 +45,21 @@ namespace FitnessClubManagement
             }
             else if (user.Role == UserRole.Trainer)
             {
-                var trainer = _dataService.Trainers
-                    .FirstOrDefault(t => t.Username == user.Username);
-
+                var trainer = _dataService.Trainers.FirstOrDefault(t => t.Username == user.Username);
+                if (trainer == null)
+                {
+                    MessageBox.Show("Trainer not found!");
+                    return;
+                }
                 dashboard = new TrainerForm(_dataService, trainer);
             }
             else if (user.Role == UserRole.Member)
             {
-                // ✅ MEMBER რეგისტრაცია
                 MemberForm form = new MemberForm(_dataService);
-
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     _dataService.Members.Add(form.NewMember);
-                    _dataService.SaveMembers(); // ✅ აქ იყო შეცდომა
-
+                    _dataService.SaveMembers();
                     MessageBox.Show("Member data saved!");
                 }
                 return;

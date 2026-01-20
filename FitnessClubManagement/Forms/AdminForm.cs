@@ -12,7 +12,7 @@ namespace FitnessClubManagement.Forms
 
         public AdminForm(DataService dataService)
         {
-            _dataService = dataService;
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             InitializeComponent();
 
             btnAddMember.Click += BtnAddMember_Click;
@@ -42,10 +42,10 @@ namespace FitnessClubManagement.Forms
             dgvMembers.CellFormatting += (s, e) =>
             {
                 if (dgvMembers.Columns[e.ColumnIndex].DataPropertyName == "Membership" && e.Value is Membership mem)
-                    e.Value = mem != null ? mem.Type.ToString() : "None";
+                    e.Value = mem?.Type.ToString() ?? "None";
 
                 if (dgvMembers.Columns[e.ColumnIndex].DataPropertyName == "AssignedTrainer" && e.Value is Trainer tr)
-                    e.Value = tr != null ? tr.FullName : "";
+                    e.Value = tr?.FullName ?? "";
             };
         }
 
@@ -55,7 +55,7 @@ namespace FitnessClubManagement.Forms
             if (form.ShowDialog() == DialogResult.OK)
             {
                 _dataService.Members.Add(form.NewMember);
-                _dataService.SaveMembers();   // ✅ აქ იყო პრობლემა
+                _dataService.SaveMembers();
                 UpdateGrid();
             }
         }
@@ -80,7 +80,7 @@ namespace FitnessClubManagement.Forms
                 member.AssignedTrainerUsername = form.NewMember.AssignedTrainerUsername;
                 member.IsActive = form.NewMember.IsActive;
 
-                _dataService.SaveMembers();   // ✅ აქაც
+                _dataService.SaveMembers();
                 UpdateGrid();
             }
         }
@@ -94,7 +94,7 @@ namespace FitnessClubManagement.Forms
             if (MessageBox.Show($"Delete {member.FullName}?", "Confirm", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 _dataService.Members.Remove(member);
-                _dataService.SaveMembers();   // ✅ და აქაც
+                _dataService.SaveMembers();
                 UpdateGrid();
             }
         }
